@@ -1,0 +1,17 @@
+FROM python:3.9-slim
+
+# Definindo o diretório de trabalho
+WORKDIR /app
+
+COPY requirements.txt .
+
+# Instalando as dependências
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Expondo a porta 8000
+EXPOSE 8000
+
+# Comando para iniciar a aplicação FastAPI com Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

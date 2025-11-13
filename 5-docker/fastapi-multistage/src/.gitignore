@@ -1,0 +1,12 @@
+# Ignorar arquivos sensiveis e temporarios
+*.env
+node_modules/
+dist/
+*.log
+.env*
+
+# Pycache e arquivos compilados
+**__pycache__/
+**/*.pyc
+.DS_Store
+*.tgz
