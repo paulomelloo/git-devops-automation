@@ -1,0 +1,63 @@
+---
+- name: Instalar Docker e rodar aplicação Java
+  hosts: targets
+  become: true
+
+  tasks:
+    - name: Atualizar pacotes # Atualiza o cache do apt
+      apt:
+        update_cache: yes
+
+    - name: Instalar dependências do Docker # Instala pacotes necessários para o Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Adicionar chave GPG do Docker # Adiciona a chave oficial do Docker
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+    - name: Adicionar repositório do Docker # Adiciona o repositório do Docker às fontes do apt
+      shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+
+    - name: Atualizar pacotes novamente # Atualiza o cache do apt após adicionar o repositório do Docker
+      apt:
+        update_cache: yes
+
+    - name: Instalar Docker # Instala o Docker CE
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Habilitar e iniciar o Docker # Garante que o serviço do Docker esteja ativo
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Instalar pip para Python 3 # Necessário para instalar o SDK do Docker
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Instalar SDK do Docker para Python # Permite que o Ansible interaja com o Docker
+      pip:
+        name: docker
+
+    - name: Adicionar usuário ao grupo docker # Permite executar comandos Docker sem sudo
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Rodar o container com a aplicação Java # Usa a imagem Docker da aplicação Java
+      docker_container:
+        name: java-api
+        image: iesodias/java-api:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "8081:8081"

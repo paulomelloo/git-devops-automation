@@ -1,0 +1,17 @@
+---
+- name: Configurar VM com pacotes básicos # Configuração de exemplo, nome do playbook
+  hosts: targets # Substitua 'targets' pelo grupo de hosts desejado
+  become: true # Elevar privilégios para tarefas que necessitam de sudo
+
+  tasks: # Definição das tarefas a serem executadas
+    - name: Atualizar lista de pacotes # Atualiza o cache do apt
+      apt:
+        update_cache: yes
+
+    - name: Instalar pacotes úteis # Instala pacotes básicos como htop, curl e git
+      apt:
+        name:
+          - htop
+          - curl
+          - git
+        state: present # Garante que os pacotes estejam instalados
